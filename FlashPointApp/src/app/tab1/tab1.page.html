@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      FlashPoint - Map
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,9 +9,12 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
+      <ion-title size="large">Map</ion-title>
     </ion-toolbar>
   </ion-header>
+</ion-content>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+<ion-content [fullscreen]="true">
+    <!--Map Div where the Leaflet Map will be-->
+    <div id="map"></div>
 </ion-content>
