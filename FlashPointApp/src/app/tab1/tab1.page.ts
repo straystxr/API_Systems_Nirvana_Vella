@@ -21,7 +21,7 @@ export class Tab1Page{
     this.map = L.map('map',{
       //adding the coordinates of where the map should be
       center: [25.3791924, 55.4765436],
-      zoom: 15, //amount of zoom
+      zoom: 20, //amount of zoom
       renderer: L.canvas()
     });
 
@@ -34,4 +34,10 @@ export class Tab1Page{
   //       .bindPopup('A pretty CSS popup.<br> Easily customizable.')
   //       .openPopup();
   }
+  //ionic uses dynamic layout which can break the leaflet plugin
+  ionViewDidEnter() {
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 200);
+}
 }
