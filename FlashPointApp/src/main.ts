@@ -4,6 +4,8 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
+import { addIcons } from 'ionicons';
+//import homeCustom from '../assets/icons/house-solid-full.svg';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -12,3 +14,7 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withPreloading(PreloadAllModules)),
   ],
 });
+/*
+addIcons({
+  'house-solid-full' : homeCustom
+})*/

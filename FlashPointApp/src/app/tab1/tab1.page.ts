@@ -20,8 +20,8 @@ export class Tab1Page{
   ngAfterViewInit(){
     this.map = L.map('map',{
       //adding the coordinates of where the map should be
-      center: [25.3791924, 55.4765436],
-      zoom: 20, //amount of zoom
+      center: [35.8983, 14.5126],
+      zoom: 30, //amount of zoom
       renderer: L.canvas()
     });
 
@@ -39,5 +39,9 @@ export class Tab1Page{
     setTimeout(() => {
       this.map.invalidateSize();
     }, 200);
+
+
+    //bounding a map view to a specific geographical bounds
+    //fitBounds() or setMaxBounds()
 }
 }
