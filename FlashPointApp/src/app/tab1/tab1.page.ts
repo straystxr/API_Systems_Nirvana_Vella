@@ -10,7 +10,7 @@ import * as L from 'leaflet';
   styleUrls: ['tab1.page.scss'],
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent],
 })
-export class Tab1Page{
+export class Tab1Page implements AfterViewInit{
 
   //initializing the variable 
   map!: L.Map;
@@ -22,11 +22,16 @@ export class Tab1Page{
       //adding the coordinates of where the map should be
       center: [35.8983, 14.5126],
       zoom: 30, //amount of zoom
-      renderer: L.canvas()
+      renderer: L.canvas(),
+      //removing the plus and minus buttons
+      zoomControl: false
     });
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  //utilising a map without the landmark icons etc to make it less busy 
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 15
     }).addTo(this.map);
 
   //Marker for now no
