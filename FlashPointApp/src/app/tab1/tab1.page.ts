@@ -158,8 +158,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy{
     const marker = L.marker([article.lat, article.lng], { icon })
       .addTo(this.map);
 
-    // popup content shown when the user taps the pin
-    // substring(0, 100) shows a short preview of the article body
+    //popup content shown when the user taps the pin
     marker.bindPopup(`
       <div style="min-width: 180px; font-family: sans-serif;">
         <p style="margin: 0 0 4px; font-size: 11px; color: #888;">
