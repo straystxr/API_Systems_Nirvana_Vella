@@ -2,11 +2,20 @@
     height:100vh;
     width:100%;
 }
- ion-content{
-    height: 100%;
-    --padding-top:0;
-    --padding-bottom:0;
- }
+
+ion-content{
+ height: 100%;
+ --padding-top: 0;
+ --padding-bottom: 0;
+ --padding-start: 0;
+ --padding-end: 0;
+}
+
+// pushing the zoom control below the header
+.leaflet-top.leaflet-right {
+  top: 200px;
+}
+
  //removing UI
 .leaflet-control-attribution {
   display: none;
