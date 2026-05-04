@@ -53,7 +53,7 @@ export class ArticleService {
   }
 
    //saves to database
-  submitArticle(data: Omit<Article, 'id' | 'createdAt'>): Observable<any> {
+ submitArticle(data: Omit<Article, 'id' | 'createdAt'>): Observable<any> {
   return this.http.post(`${environment.apiUrl}/add-article.php`, data);
 }
 

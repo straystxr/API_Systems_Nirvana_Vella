@@ -150,26 +150,24 @@ export class ArticleModalComponent implements OnInit {
 
   // Called when the user taps Publish
   // The parent reads role === 'confirm' to know it should save the article
-  submit() {
+submit() {
   if (this.form.invalid) return;
 
+  console.log('Form value being sent:', this.form.value);
+
   this.articleService.submitArticle(this.form.value).subscribe({
-    next: (res) => {
-      if (res.success) {
-        // Also keep it in memory so the map updates instantly
-        this.articleService.addArticle({
-          ...this.form.value,
-          lat: this.lat,
-          lng: this.lng,
-        });
-        this.modalCtrl.dismiss(this.form.value, 'confirm');
-      } else {
-        console.error('Failed to save:', res.message);
-      }
-    },
-    error: (err) => {
+    next: (res: any) => {
+  console.log('Full response:', JSON.stringify(res)); 
+  if (res && res.success) {
+    this.modalCtrl.dismiss(this.form.value, 'confirm');
+  } else {
+    console.error('Failed to save:', res?.message);
+  }
+},
+    error: (err: any) => {
       console.error('HTTP error:', err);
     }
   });
+  
 }
 }
