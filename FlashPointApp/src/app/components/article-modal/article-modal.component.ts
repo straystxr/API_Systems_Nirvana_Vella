@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 // CommonModule provides basic Angular directives like *ngIf and *ngFor
 import { CommonModule } from '@angular/common';
+import { ArticleService } from '../../services/article'
 
 //FormBuilder is to create a form for the articles and FormGroup is the container that holds all form controls together
 //validators provides built-in validation rules like required and minLength so the article is never too short,
@@ -123,7 +124,8 @@ export class ArticleModalComponent implements OnInit {
     //formBuilder is a helper service that makes creating form controls cleaner
     private fb: FormBuilder,
     //ModalController lets this component close itself and pass data back
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private articleService: ArticleService
   ) {}
 
   //ngOnInit runs after Angular has set all @Input() values
@@ -149,7 +151,25 @@ export class ArticleModalComponent implements OnInit {
   // Called when the user taps Publish
   // The parent reads role === 'confirm' to know it should save the article
   submit() {
-    if (this.form.invalid) return;
-    this.modalCtrl.dismiss(this.form.value, 'confirm');
-  }
+  if (this.form.invalid) return;
+
+  this.articleService.submitArticle(this.form.value).subscribe({
+    next: (res) => {
+      if (res.success) {
+        // Also keep it in memory so the map updates instantly
+        this.articleService.addArticle({
+          ...this.form.value,
+          lat: this.lat,
+          lng: this.lng,
+        });
+        this.modalCtrl.dismiss(this.form.value, 'confirm');
+      } else {
+        console.error('Failed to save:', res.message);
+      }
+    },
+    error: (err) => {
+      console.error('HTTP error:', err);
+    }
+  });
+}
 }

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 //every article in the app must have exactly these fields
 export interface Article {
@@ -11,6 +13,10 @@ export interface Article {
   lng: number; //longitude of the pin on the map
   authorName: string; //name entered by the user in the form
   createdAt: Date; //timestamp set automatically when article is saved / could be used for filtering as a future development
+  url: string;
+  source: string;
+  status: string;
+  verification_status: string;
 }
 
 //@Injectable marks this class as something Angular can inject into other classes
@@ -20,6 +26,8 @@ export class ArticleService {
 
   //it starts as an empty array and emits a new array every time articles change
   private articles$ = new BehaviorSubject<Article[]>([]);
+
+  constructor(private http: HttpClient) {}
 
   getArticles(): Observable<Article[]> {
     return this.articles$.asObservable();
@@ -43,6 +51,11 @@ export class ArticleService {
     //early return the completed article so the caller can use its generated id
     return article;
   }
+
+   //saves to database
+  submitArticle(data: Omit<Article, 'id' | 'createdAt'>): Observable<any> {
+  return this.http.post(`${environment.apiUrl}/add-article.php`, data);
+}
 
   //method to find a single article by its id returns undefined if no match found
   getById(id: string): Article | undefined {

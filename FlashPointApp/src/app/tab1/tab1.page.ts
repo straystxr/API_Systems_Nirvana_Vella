@@ -113,6 +113,10 @@ export class Tab1Page implements AfterViewInit, OnDestroy{
         authorName: data.authorName,
         lat,
         lng,
+        url: '',
+        source: '',
+        status: 'pending',
+        verification_status: 'unverified', 
       });
 
       await this.showToast(`"${data.title}" published!`);
