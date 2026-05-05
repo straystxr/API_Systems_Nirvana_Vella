@@ -5,4 +5,14 @@ import { Injectable } from '@angular/core';
 })
 export class Auth {
   
+  constructor() {}
+
+  async login(): Promise<void> {
+    
+  }
+
+  async handleLoginCallback(url: string): Promise<void> {
+    
+  }  
 }
+
