@@ -1,0 +1,209 @@
+ion-content {
+  --background: transparent;
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0d1b3e 0%, #1a2d5a 100%);
+}
+
+//logo section css
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px 36px;
+  width: 100%;
+}
+
+.logo-img {
+  width: 200px;
+  height: auto;
+}
+
+//login section with the form css
+.login-card {
+  background: #f0f0f0;
+  border-radius: 28px 28px 0 0;
+  padding: 36px 28px 40px;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.login-title {
+  font-family: 'Arial Black', 'Arial Bold', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #1a2d5a;
+  margin: 0 0 28px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.form-group {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #f5a623;
+  border-radius: 50px;
+  background: #ffffff;
+  font-size: 15px;
+  color: #1a2d5a;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder {
+    color: #9aa0b4;
+  }
+
+  &:focus {
+    border-color: #e09010;
+    box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
+  }
+}
+
+//forgot Password
+.forgot-password {
+  width: 100%;
+  text-align: right;
+  margin-bottom: 20px;
+  margin-top: -4px;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #3a6bd4;
+  text-decoration: none;
+  font-style: italic;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Login
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  background: #1a2d5a;
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.1s ease;
+
+  &:hover {
+    background: #0d1b3e;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.error-message {
+  width: 100%;
+  padding: 10px 16px;
+  background: #ffe0e0;
+  border: 1px solid #f44336;
+  border-radius: 8px;
+  color: #c62828;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+//Divider line for design based on Figma
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: #f5a623;
+}
+
+.divider-text {
+  font-size: 13px;
+  color: #4a5068;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+//Logging in with socials buttons
+.social-login {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.social-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 45, 90, 0.25);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+//Signup text that leads to registration page
+.signup-text {
+  font-size: 13px;
+  color: #4a5068;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.signup-link {
+  color: #3a6bd4;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.brand-footer {
+  font-size: 13px;
+  color: #4a5068;
+  font-style: italic;
+  margin: 0;
+  text-align: center;
+}
