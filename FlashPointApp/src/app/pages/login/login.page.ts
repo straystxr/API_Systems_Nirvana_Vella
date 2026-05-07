@@ -19,7 +19,7 @@ import { Auth } from '../../services/auth';
 })
 export class LoginPage implements OnInit {
   public errorMessage: string = '';
-  public username: string = '';
+  public email: string = '';
   public password: string = '';
 
   constructor(
@@ -28,24 +28,13 @@ export class LoginPage implements OnInit {
     private router: Router
   ) {}
 
-  async ngOnInit() {
-    if (window.location.hash) {
-      const loadingIndicator = await this.showLoadingIndicator();
-      try {
-        await this.authService.handleLoginCallback(window.location.href);
-        this.router.navigate(['/tabs']);
-      } catch (e: any) {
-        this.errorMessage = e.message;
-      } finally {
-        loadingIndicator.dismiss();
-      }
-    }
-  }
+  //for now adding a simple login without auth so yan can work on it later
+  async ngOnInit() {}
 
   async login() {
     const loadingIndicator = await this.showLoadingIndicator();
     try {
-      await this.authService.login();
+      await this.authService.login(this.email, this.password);
       this.router.navigate(['/tabs']);
     } catch (e: any) {
       console.error(e.message);

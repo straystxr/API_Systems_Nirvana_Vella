@@ -1,4 +1,5 @@
 <?php
+
 function handleAuth(string $method, string $action) {
     match ($action) {
         'register' => authRegister($method),
