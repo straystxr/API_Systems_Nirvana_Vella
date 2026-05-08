@@ -1,19 +1,32 @@
 <?php
 // ─── DB CONNECTION ────────────────────────────────────────────────────────────
 define('DB_HOST', 'localhost');
+define('DB_PORT', '8889'); //mamp sql 
 define('DB_USER', 'root');
-define('DB_PASS', '');
+//define('DB_PASS', ''); //XAMPP password
+define('DB_PASS', 'root'); //MAMP default password
 define('DB_NAME', 'flashpoint');
 
 function getDB() {
     static $pdo = null;
     if ($pdo === null) {
-        $pdo = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-            DB_USER, DB_PASS,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-        );
+        try {
+            $pdo = new PDO(
+                'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME . ';charset=utf8mb4',
+                DB_USER, DB_PASS,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+            );
+        } catch (PDOException $e) {
+            // Log the error and return a friendly message
+            error_log("Database connection failed: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Database connection failed',
+                'details' => $e->getMessage()
+            ]);
+            exit;
+        }
     }
     return $pdo;
 }

@@ -14,7 +14,8 @@ export class Auth {
   async login(email: string, password: string): Promise<any> {
 
     return await firstValueFrom(
-      this.http.post(`${this.apiUrl}/login.page.ts`, {
+      //this.http.post(`${this.apiUrl}/login` this.apiUrl is calling the path and login is calling the function/method
+      this.http.post(`${this.apiUrl}/login`, {
         email,
         password
       })
