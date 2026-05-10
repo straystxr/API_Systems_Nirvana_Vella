@@ -8,8 +8,8 @@ import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+  templateUrl: './login.html',
+  styleUrls: ['./login.scss'],
   standalone: true,
   imports: [
     CommonModule,

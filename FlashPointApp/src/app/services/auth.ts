@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root',
 })
 export class Auth {
-
+  //still having issues for some reason
   private apiUrl = 'http://localhost:8888/API_Systems_Nirvana_Vella/flashpoint-api/api/auth';
   
   constructor(private http: HttpClient) {}

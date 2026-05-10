@@ -1,14 +1,13 @@
 import { Routes } from '@angular/router';
-
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'login', // Changed from 'login' for now due to some issues
     pathMatch: 'full'
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage)
+    loadComponent: () => import('./pages/login/login').then(m => m.LoginPage)
   },
   {
     path: 'tabs',
