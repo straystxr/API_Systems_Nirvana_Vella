@@ -15,7 +15,7 @@ export class Auth {
 
     return await firstValueFrom(
       //this.http.post(`${this.apiUrl}/login` this.apiUrl is calling the path and login is calling the function/method
-      this.http.post(`${this.apiUrl}/login`, {
+      this.http.post(`${this.apiUrl}/login/login.php`, {
         email,
         password
       })

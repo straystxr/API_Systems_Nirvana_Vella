@@ -1,22 +1,16 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      FlashPoint - Map
-    </ion-title>
+    <ion-title>FlashPoint - Map</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" scroll-y="false" scroll-x="false">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Map</ion-title>
     </ion-toolbar>
   </ion-header>
+  
+  <!-- Use #mapContainer so ViewChild can find it -->
+  <div #mapContainer id="map"></div>
 </ion-content>
-
-<ion-content [fullscreen]="true">
-    <!--Map Div where the Leaflet Map will be-->
-    <div id="map"></div>
-</ion-content>
-
-

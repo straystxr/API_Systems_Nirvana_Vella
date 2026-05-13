@@ -9,14 +9,43 @@ ion-content{
  --padding-bottom: 0;
  --padding-start: 0;
  --padding-end: 0;
+ pointer-events: auto;
+}
+
+ion-content::part(scroll){
+  overflow: hidden !important;
 }
 
 // pushing the zoom control below the header
 .leaflet-top.leaflet-right {
-  top: 200px;
+  top: 60px !important;
 }
+
+.leaflet-top.leaflet-right {
+  top: 60px !important;
+}
+
 
  //removing UI
 .leaflet-control-attribution {
-  display: none;
+  display: none !important;
+}
+
+.leaflet-container {
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.leaflet-pane,
+.leaflet-interactive,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  pointer-events: auto !important;
+}
+
+.leaflet-control-zoom,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }

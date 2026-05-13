@@ -11,12 +11,15 @@
 
 
     $data = json_decode(file_get_contents("php://input"));
+    if ($data == null) $data = array( "email" => "", "password" => "" );
 
     $email = $data->email;
     $password = $data->password;
 
     // lookup user in database
     // verify password hash
+
+    $validUser = true;
 
     if ($validUser) {
         echo json_encode([

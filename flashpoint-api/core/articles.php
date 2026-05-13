@@ -12,7 +12,11 @@ class Articles{
     public $content;
     public $url;
     public $created_by;
+    public $created_at;
     public $verification_status;
+    public $category;
+    public $updated_at;
+  
 
 
     //connection
@@ -37,7 +41,7 @@ class Articles{
             LIMIT 1;"; //ensures that it only gives us one result from the SQL
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->created_by);
+        $stmt->bindParam(1, $this->id);
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -76,12 +80,12 @@ class Articles{
             $stmt = $this->conn->prepare($query);
 
             //by doing this we are prevent sqlinjection
-            $this->userId = htmlspecialchars(strip_tags($this->userId));
+            $this->created_by = htmlspecialchars(strip_tags($this->created_by));
             $this->title = htmlspecialchars(strip_tags($this->title));
             $this->content = htmlspecialchars(strip_tags($this->content));
 
             //this creates a security issue which is then fixed with the above
-            $stmt->bindParam(":created_by", $this->userId);
+            $stmt->bindParam(":created_by", $this->created_by);
             $stmt->bindParam(":title", $this->title);
             $stmt->bindParam(":content", $this->content);
 
