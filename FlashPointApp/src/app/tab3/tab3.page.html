@@ -9,7 +9,7 @@
 <ion-content [fullscreen]="true">
   <div class="profile-wrapper" *ngIf="user">
 
-    <!-- Profile Header — sits on dark gradient -->
+    <!-- Profile Header -->
     <div class="profile-header">
       <div class="avatar-wrap" (click)="pickPhoto()">
         <img *ngIf="user.profile_photo" [src]="user.profile_photo" class="avatar-img" alt="Profile Photo"/>
@@ -25,7 +25,7 @@
       <span class="role-badge">{{ user.role }}</span>
     </div>
 
-    <!-- White card section — like login card -->
+    <!-- White card section -->
     <div class="profile-body">
 
       <!-- User Info -->
@@ -54,59 +54,43 @@
 
         <div class="membership-features">
           <div class="feature" [class.active]="membership.can_remove_ads">
-            <ion-icon [name]="membership.can_remove_ads ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-            No Ads
+            <ion-icon [name]="membership.can_remove_ads ? 'checkmark-circle' : 'close-circle'"></ion-icon>No Ads
           </div>
           <div class="feature" [class.active]="membership.can_post_news">
-            <ion-icon [name]="membership.can_post_news ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-            Post Articles
+            <ion-icon [name]="membership.can_post_news ? 'checkmark-circle' : 'close-circle'"></ion-icon>Post Articles
           </div>
           <div class="feature" [class.active]="membership.can_upload_media">
-            <ion-icon [name]="membership.can_upload_media ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-            Upload Media
+            <ion-icon [name]="membership.can_upload_media ? 'checkmark-circle' : 'close-circle'"></ion-icon>Upload Media
           </div>
           <div class="feature" [class.active]="membership.can_bookmark">
-            <ion-icon [name]="membership.can_bookmark ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-            Bookmarks
+            <ion-icon [name]="membership.can_bookmark ? 'checkmark-circle' : 'close-circle'"></ion-icon>Bookmarks
           </div>
           <div class="feature" [class.active]="membership.can_comment">
-            <ion-icon [name]="membership.can_comment ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-            Comments
+            <ion-icon [name]="membership.can_comment ? 'checkmark-circle' : 'close-circle'"></ion-icon>Comments
           </div>
           <div class="feature" [class.active]="membership.can_get_discounts">
-            <ion-icon [name]="membership.can_get_discounts ? 'checkmark-circle' : 'close-circle'"></ion-icon>
-            Discounts
+            <ion-icon [name]="membership.can_get_discounts ? 'checkmark-circle' : 'close-circle'"></ion-icon>Discounts
           </div>
         </div>
 
         <div class="membership-actions">
-          <!-- Basic — upgrade only -->
           <button class="upgrade-btn" (click)="showUpgradeOptions()" *ngIf="membership.tier_id == 1">
-            <ion-icon name="arrow-up-circle-outline"></ion-icon>
-            Upgrade Plan
+            <ion-icon name="arrow-up-circle-outline"></ion-icon>Upgrade Plan
           </button>
-
-          <!-- Premium — upgrade to journalism or cancel -->
           <ng-container *ngIf="membership.tier_id == 2">
-            <button class="upgrade-btn" (click)="confirmChange(3)">
-              <ion-icon name="arrow-up-circle-outline"></ion-icon>
-              Upgrade to Journalism
+            <button class="upgrade-btn" (click)="startUpgrade(3)">
+              <ion-icon name="arrow-up-circle-outline"></ion-icon>Upgrade to Journalism
             </button>
             <button class="cancel-sub-btn" (click)="confirmChange(1)">
-              <ion-icon name="close-circle-outline"></ion-icon>
-              Cancel Subscription
+              <ion-icon name="close-circle-outline"></ion-icon>Cancel Subscription
             </button>
           </ng-container>
-
-          <!-- Journalism — downgrade or cancel -->
           <ng-container *ngIf="membership.tier_id == 3">
             <button class="downgrade-btn" (click)="confirmChange(2)">
-              <ion-icon name="arrow-down-circle-outline"></ion-icon>
-              Downgrade to Premium
+              <ion-icon name="arrow-down-circle-outline"></ion-icon>Downgrade to Premium
             </button>
             <button class="cancel-sub-btn" (click)="confirmChange(1)">
-              <ion-icon name="close-circle-outline"></ion-icon>
-              Cancel Subscription
+              <ion-icon name="close-circle-outline"></ion-icon>Cancel Subscription
             </button>
           </ng-container>
         </div>
@@ -119,16 +103,14 @@
       <!-- Logout -->
       <div class="logout-section">
         <button class="logout-btn" (click)="logout()">
-          <ion-icon name="log-out-outline"></ion-icon>
-          Log Out
+          <ion-icon name="log-out-outline"></ion-icon>Log Out
         </button>
       </div>
 
-    </div><!-- /profile-body -->
-
+    </div>
   </div>
 
-  <!-- Upgrade Modal -->
+  <!-- ── UPGRADE PLAN PICKER MODAL ─────────────────────────────────── -->
   <div class="upgrade-modal" *ngIf="showUpgrade">
     <div class="upgrade-backdrop" (click)="showUpgrade = false"></div>
     <div class="upgrade-sheet">
@@ -150,14 +132,146 @@
         <div class="tier-features-text">Everything in Premium · Post articles · Verified badge</div>
       </div>
 
-      <button class="confirm-upgrade-btn" (click)="upgradeMembership()" [disabled]="!selectedTier">
-        Confirm Upgrade
+      <button class="confirm-upgrade-btn" (click)="proceedToPayment()" [disabled]="!selectedTier">
+        Continue to Payment
       </button>
       <button class="cancel-btn" (click)="showUpgrade = false">Cancel</button>
     </div>
   </div>
 
-  <!-- Confirm Change Modal -->
+  <!-- ── PAYMENT MODAL ─────────────────────────────────────────────── -->
+  <div class="upgrade-modal" *ngIf="showPayment">
+    <div class="upgrade-backdrop" (click)="showPayment = false"></div>
+    <div class="upgrade-sheet payment-sheet">
+
+      <!-- Plan Summary -->
+      <div class="payment-summary">
+        <div class="payment-plan-name">{{ selectedTier === 2 ? 'Premium' : 'Journalism' }}</div>
+        <div class="payment-plan-price">{{ selectedTier === 2 ? '€5.99' : '€12.99' }}<span>/mo</span></div>
+      </div>
+
+      <h3 class="upgrade-title">Payment Details</h3>
+
+      <!-- Card Preview -->
+      <div class="card-preview">
+        <div class="card-preview-top">
+          <div class="card-chip">
+            <div class="chip-line"></div>
+            <div class="chip-line"></div>
+            <div class="chip-line"></div>
+          </div>
+          <div class="card-type-icon">
+            <ion-icon name="card-outline"></ion-icon>
+          </div>
+        </div>
+        <div class="card-number-display">{{ cardNumberDisplay }}</div>
+        <div class="card-preview-bottom">
+          <div>
+            <div class="card-preview-label">CARDHOLDER</div>
+            <div class="card-preview-value">{{ cardName || 'YOUR NAME' }}</div>
+          </div>
+          <div>
+            <div class="card-preview-label">EXPIRES</div>
+            <div class="card-preview-value">{{ cardExpiry || 'MM/YY' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Form -->
+      <div class="pay-form">
+        <div class="form-group">
+          <label class="pay-label">Cardholder Name</label>
+          <input
+            type="text"
+            class="pay-input"
+            placeholder="Jon Cesare"
+            [(ngModel)]="cardName"
+            (input)="cardName = cardName.toUpperCase()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="pay-label">Card Number</label>
+          <input
+            type="text"
+            class="pay-input"
+            placeholder="1234 5678 9012 3456"
+            [(ngModel)]="cardNumber"
+            (input)="formatCardNumber($event)"
+            maxlength="19"
+          />
+        </div>
+
+        <div class="pay-row">
+          <div class="form-group">
+            <label class="pay-label">Expiry Date</label>
+            <input
+              type="text"
+              class="pay-input"
+              placeholder="MM/YY"
+              [(ngModel)]="cardExpiry"
+              (input)="formatExpiry($event)"
+              maxlength="5"
+            />
+          </div>
+          <div class="form-group">
+            <label class="pay-label">CVV</label>
+            <input
+              type="password"
+              class="pay-input"
+              placeholder="•••"
+              [(ngModel)]="cardCvv"
+              maxlength="3"
+            />
+          </div>
+        </div>
+
+        <div class="pay-error" *ngIf="paymentError">{{ paymentError }}</div>
+
+        <button class="confirm-upgrade-btn" (click)="processPayment()" [disabled]="processingPayment">
+          <span *ngIf="!processingPayment">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            Pay {{ selectedTier === 2 ? '€5.99' : '€12.99' }}/mo
+          </span>
+          <span *ngIf="processingPayment">Processing...</span>
+        </button>
+        <button class="cancel-btn" (click)="showPayment = false; showUpgrade = true">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAYMENT SUCCESS MODAL ─────────────────────────────────────── -->
+  <div class="upgrade-modal" *ngIf="showReceipt">
+    <div class="upgrade-backdrop"></div>
+    <div class="upgrade-sheet receipt-sheet">
+      <div class="receipt-icon">✓</div>
+      <h3 class="receipt-title">Payment Successful!</h3>
+      <p class="receipt-sub">Welcome to {{ selectedTier === 2 ? 'Premium' : 'Journalism' }}</p>
+
+      <div class="receipt-card">
+        <div class="receipt-row">
+          <span>Plan</span>
+          <span>{{ selectedTier === 2 ? 'Premium' : 'Journalism' }}</span>
+        </div>
+        <div class="receipt-row">
+          <span>Amount charged</span>
+          <span>{{ selectedTier === 2 ? '€5.99' : '€12.99' }}</span>
+        </div>
+        <div class="receipt-row">
+          <span>Card ending</span>
+          <span>•••• {{ cardNumber.slice(-4) }}</span>
+        </div>
+        <div class="receipt-row">
+          <span>Next billing</span>
+          <span>{{ nextBillingDate }}</span>
+        </div>
+      </div>
+
+      <button class="confirm-upgrade-btn" (click)="closeReceipt()">Done</button>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM CHANGE MODAL (downgrade/cancel) ───────────────────── -->
   <div class="upgrade-modal" *ngIf="showConfirm">
     <div class="upgrade-backdrop" (click)="showConfirm = false"></div>
     <div class="upgrade-sheet">
@@ -169,16 +283,13 @@
             ? 'Downgrade to Premium (€5.99/mo)? You will lose Journalism features immediately.'
             : 'Upgrade to Journalism (€12.99/mo)?' }}
       </p>
-      <button class="confirm-upgrade-btn"
-        [class.danger]="confirmTierId === 1"
-        (click)="applyChange()">
+      <button class="confirm-upgrade-btn" [class.danger]="confirmTierId === 1" (click)="applyChange()">
         {{ confirmTierId === 1 ? 'Yes, Cancel Subscription' : 'Confirm' }}
       </button>
       <button class="cancel-btn" (click)="showConfirm = false">Go Back</button>
     </div>
   </div>
 
-  <!-- Hidden file input -->
   <input type="file" #photoInput accept="image/*" style="display:none" (change)="onPhotoSelected($event)"/>
 
 </ion-content>
