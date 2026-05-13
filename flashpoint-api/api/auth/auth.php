@@ -7,17 +7,24 @@ function handleAuth(string $method, string $action) {
     };
 }
 
+// ─── POST /api/auth/register ─────────────────────────────────────────────────
 function authRegister(string $method) {
     if ($method !== 'POST') error('Method not allowed', 405);
 
     $b = body();
     $required = ['name', 'username', 'email', 'password', 'role'];
     foreach ($required as $f) {
-        if (empty($b[$f])) error("Missing field: $f");
+        if (empty($b[$f])) error("Missing field: $f", 400);
     }
 
     $allowedRoles = ['general', 'journalist', 'verifier', 'admin'];
-    if (!in_array($b['role'], $allowedRoles)) error('Invalid role');
+    if (!in_array($b['role'], $allowedRoles)) error('Invalid role. Must be: general, journalist, verifier or admin', 400);
+
+    // Basic email format check
+    if (!filter_var($b['email'], FILTER_VALIDATE_EMAIL)) error('Invalid email format', 400);
+
+    // Password length check
+    if (strlen($b['password']) < 6) error('Password must be at least 6 characters', 400);
 
     $db = getDB();
 
@@ -36,7 +43,7 @@ function authRegister(string $method) {
     try {
         $db->beginTransaction();
 
-        // 1. Insert user - DB auto generates the int id
+        // 1. Insert user — DB auto generates int id
         $db->prepare("
             INSERT INTO users (username, display_name, email, password_hash, user_type, is_verified)
             VALUES (?, ?, ?, ?, ?, 0)
@@ -44,7 +51,7 @@ function authRegister(string $method) {
 
         $userId = (int)$db->lastInsertId();
 
-        // 2. Insert membership with tier_id = 1 (basic)
+        // 2. Insert basic membership (tier_id = 1)
         $db->prepare("
             INSERT INTO memberships (user_id, tier_id)
             VALUES (?, 1)
@@ -78,21 +85,40 @@ function authRegister(string $method) {
     ], 201);
 }
 
+// ─── POST /api/auth/login ─────────────────────────────────────────────────────
+// Accepts either email OR username + password
 function authLogin(string $method) {
     if ($method !== 'POST') error('Method not allowed', 405);
 
     $b = body();
-    if (empty($b['email']) || empty($b['password'])) error('Email and password required');
 
-    $db   = getDB();
-    $stmt = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
-    $stmt->execute([$b['email']]);
+    // Must have password
+    if (empty($b['password'])) error('Password is required', 400);
+
+    // Must have either email or username
+    if (empty($b['email']) && empty($b['username'])) {
+        error('Either email or username is required', 400);
+    }
+
+    $db = getDB();
+
+    // Find user by email OR username
+    if (!empty($b['email'])) {
+        $stmt = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+        $stmt->execute([$b['email']]);
+    } else {
+        $stmt = $db->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt->execute([$b['username']]);
+    }
+
     $user = $stmt->fetch();
 
+    // Check user exists and password matches
     if (!$user || !password_verify($b['password'], $user['password_hash'])) {
         error('Invalid credentials', 401);
     }
 
+    // Generate Bearer token
     $token = generateToken([
         'sub'  => $user['id'],
         'name' => $user['display_name'],

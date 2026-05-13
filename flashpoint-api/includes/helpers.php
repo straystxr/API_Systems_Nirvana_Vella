@@ -47,10 +47,23 @@ function generateToken(array $payload): string {
 }
 
 function verifyToken(): array {
-    $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-    if (!str_starts_with($auth, 'Bearer ')) error('No token provided', 401);
+    // XAMPP sometimes puts the token in different places
+    $auth = '';
+    if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        $auth = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $auth = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+        $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+    }
+
+    if (empty($auth) || !str_starts_with($auth, 'Bearer ')) error('No token provided', 401);
+    
     $token = substr($auth, 7);
-    [$encoded, $sig] = explode('.', $token, 2) + [null, null];
+    $parts = explode('.', $token, 2);
+    $encoded = $parts[0] ?? null;
+    $sig = $parts[1] ?? null;
     if (!$encoded || !$sig) error('Malformed token', 401);
     if (!hash_equals(hash_hmac('sha256', $encoded, TOKEN_SECRET), $sig)) error('Invalid token', 401);
     $payload = json_decode(base64_decode($encoded), true);

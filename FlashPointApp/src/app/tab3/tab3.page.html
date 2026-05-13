@@ -1,17 +1,184 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <div class="header-logo">
+      <img src="assets/FlashPoint_Graphics/logo.svg" alt="FlashPoint" class="header-logo-img"/>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="profile-wrapper" *ngIf="user">
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+    <!-- Profile Header — sits on dark gradient -->
+    <div class="profile-header">
+      <div class="avatar-wrap" (click)="pickPhoto()">
+        <img *ngIf="user.profile_photo" [src]="user.profile_photo" class="avatar-img" alt="Profile Photo"/>
+        <div *ngIf="!user.profile_photo" class="avatar-placeholder">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </div>
+        <div class="avatar-overlay">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+      </div>
+      <h2 class="display-name">{{ user.name }}</h2>
+      <p class="username">@{{ user.username }}</p>
+      <span class="role-badge">{{ user.role }}</span>
+    </div>
+
+    <!-- White card section — like login card -->
+    <div class="profile-body">
+
+      <!-- User Info -->
+      <div class="info-card">
+        <div class="info-row">
+          <ion-icon name="mail-outline"></ion-icon>
+          <span>{{ user.email }}</span>
+        </div>
+        <div class="info-row">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <span>{{ user.is_verified ? 'Verified Account' : 'Unverified Account' }}</span>
+        </div>
+      </div>
+
+      <!-- Membership Card -->
+      <div class="membership-card" *ngIf="membership">
+        <div class="membership-header">
+          <div>
+            <div class="membership-label">Current Plan</div>
+            <div class="membership-name">{{ membership.name }}</div>
+          </div>
+          <div class="membership-price">
+            {{ membership.price_eur == '0.00' ? 'Free' : '€' + membership.price_eur + '/mo' }}
+          </div>
+        </div>
+
+        <div class="membership-features">
+          <div class="feature" [class.active]="membership.can_remove_ads">
+            <ion-icon [name]="membership.can_remove_ads ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            No Ads
+          </div>
+          <div class="feature" [class.active]="membership.can_post_news">
+            <ion-icon [name]="membership.can_post_news ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            Post Articles
+          </div>
+          <div class="feature" [class.active]="membership.can_upload_media">
+            <ion-icon [name]="membership.can_upload_media ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            Upload Media
+          </div>
+          <div class="feature" [class.active]="membership.can_bookmark">
+            <ion-icon [name]="membership.can_bookmark ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            Bookmarks
+          </div>
+          <div class="feature" [class.active]="membership.can_comment">
+            <ion-icon [name]="membership.can_comment ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            Comments
+          </div>
+          <div class="feature" [class.active]="membership.can_get_discounts">
+            <ion-icon [name]="membership.can_get_discounts ? 'checkmark-circle' : 'close-circle'"></ion-icon>
+            Discounts
+          </div>
+        </div>
+
+        <div class="membership-actions">
+          <!-- Basic — upgrade only -->
+          <button class="upgrade-btn" (click)="showUpgradeOptions()" *ngIf="membership.tier_id == 1">
+            <ion-icon name="arrow-up-circle-outline"></ion-icon>
+            Upgrade Plan
+          </button>
+
+          <!-- Premium — upgrade to journalism or cancel -->
+          <ng-container *ngIf="membership.tier_id == 2">
+            <button class="upgrade-btn" (click)="confirmChange(3)">
+              <ion-icon name="arrow-up-circle-outline"></ion-icon>
+              Upgrade to Journalism
+            </button>
+            <button class="cancel-sub-btn" (click)="confirmChange(1)">
+              <ion-icon name="close-circle-outline"></ion-icon>
+              Cancel Subscription
+            </button>
+          </ng-container>
+
+          <!-- Journalism — downgrade or cancel -->
+          <ng-container *ngIf="membership.tier_id == 3">
+            <button class="downgrade-btn" (click)="confirmChange(2)">
+              <ion-icon name="arrow-down-circle-outline"></ion-icon>
+              Downgrade to Premium
+            </button>
+            <button class="cancel-sub-btn" (click)="confirmChange(1)">
+              <ion-icon name="close-circle-outline"></ion-icon>
+              Cancel Subscription
+            </button>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="success-msg" *ngIf="successMessage">{{ successMessage }}</div>
+      <div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <!-- Logout -->
+      <div class="logout-section">
+        <button class="logout-btn" (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
+          Log Out
+        </button>
+      </div>
+
+    </div><!-- /profile-body -->
+
+  </div>
+
+  <!-- Upgrade Modal -->
+  <div class="upgrade-modal" *ngIf="showUpgrade">
+    <div class="upgrade-backdrop" (click)="showUpgrade = false"></div>
+    <div class="upgrade-sheet">
+      <h3 class="upgrade-title">Choose a Plan</h3>
+
+      <div class="tier-card" (click)="selectTier(2)" [class.selected]="selectedTier === 2">
+        <div class="tier-info">
+          <div class="tier-name">Premium</div>
+          <div class="tier-price">€5.99<span>/mo</span></div>
+        </div>
+        <div class="tier-features-text">No ads · Save articles · Unlimited comments & media</div>
+      </div>
+
+      <div class="tier-card" (click)="selectTier(3)" [class.selected]="selectedTier === 3">
+        <div class="tier-info">
+          <div class="tier-name">Journalism</div>
+          <div class="tier-price">€12.99<span>/mo</span></div>
+        </div>
+        <div class="tier-features-text">Everything in Premium · Post articles · Verified badge</div>
+      </div>
+
+      <button class="confirm-upgrade-btn" (click)="upgradeMembership()" [disabled]="!selectedTier">
+        Confirm Upgrade
+      </button>
+      <button class="cancel-btn" (click)="showUpgrade = false">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Confirm Change Modal -->
+  <div class="upgrade-modal" *ngIf="showConfirm">
+    <div class="upgrade-backdrop" (click)="showConfirm = false"></div>
+    <div class="upgrade-sheet">
+      <h3 class="upgrade-title">{{ confirmTierId === 1 ? 'Cancel Subscription' : 'Change Plan' }}</h3>
+      <p class="confirm-text">
+        {{ confirmTierId === 1
+          ? 'Are you sure you want to cancel and return to Basic (free)? You will lose premium features immediately.'
+          : confirmTierId === 2
+            ? 'Downgrade to Premium (€5.99/mo)? You will lose Journalism features immediately.'
+            : 'Upgrade to Journalism (€12.99/mo)?' }}
+      </p>
+      <button class="confirm-upgrade-btn"
+        [class.danger]="confirmTierId === 1"
+        (click)="applyChange()">
+        {{ confirmTierId === 1 ? 'Yes, Cancel Subscription' : 'Confirm' }}
+      </button>
+      <button class="cancel-btn" (click)="showConfirm = false">Go Back</button>
+    </div>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" #photoInput accept="image/*" style="display:none" (change)="onPhotoSelected($event)"/>
+
 </ion-content>
