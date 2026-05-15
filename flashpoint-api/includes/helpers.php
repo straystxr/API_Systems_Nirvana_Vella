@@ -1,21 +1,32 @@
 <?php
 // ─── DB CONNECTION ────────────────────────────────────────────────────────────
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'flashpoint');
+$host = '127.0.0.1';
+$dbname = 'flashpoint';      
+$user = 'root';
+$pass = 'root';
+$charset = 'utf8mb4';
+$dsn = "mysql:host=$host;port=8889;dbname=$dbname;charset=$charset";
 
 function getDB() {
-    static $pdo = null;
-    if ($pdo === null) {
-        $pdo = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-            DB_USER, DB_PASS,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-        );
+    static $db = null;
+    if ($db !== null) return $db;
+    $host = '127.0.0.1';
+    $dbname = 'flashpoint';      
+    $user = 'root';
+    $pass = 'root';
+    $charset = 'utf8mb4';
+    $dsn = "mysql:host=$host;port=8889;dbname=$dbname;charset=$charset";
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+    try {
+        $db = new PDO($dsn, $user, $pass, $options);
+        return $db;
+    } catch (PDOException $e) {
+        error('Database connection failed: ' . $e->getMessage(), 500);
     }
-    return $pdo;
 }
 
 // ─── RESPONSE HELPERS ─────────────────────────────────────────────────────────

@@ -1,13 +1,15 @@
 <?php
+require_once __DIR__.'/../../config.php';
 function handleAuth(string $method, string $action) {
     match ($action) {
         'register' => authRegister($method),
         'login'    => authLogin($method),
+        //'google_login' => authGoogleLogin($method),
         default    => error('Auth endpoint not found', 404),
     };
 }
 
-// ─── POST /api/auth/register ─────────────────────────────────────────────────
+//POST /api/auth/register
 function authRegister(string $method) {
     if ($method !== 'POST') error('Method not allowed', 405);
 
@@ -141,3 +143,113 @@ function authLogin(string $method) {
         ],
     ]);
 }
+/*
+function authGoogleLogin(string $method) {
+    if ($method !== 'POST') error('Method not allowed', 405);
+
+    $b = body();
+    if (empty($b['id_token'])) error('Google ID token required');
+
+    $googleClientId = 'clientid';
+    // Verify token with Google
+    $tokenInfo = @file_get_contents(
+        'https://oauth2.googleapis.com/tokeninfo?id_token=' . urlencode($b['id_token']);
+    );
+
+    if (!$tokenInfo) {
+        error('Failed to verify token with Google', 400);
+    }
+
+    $payload = json_decode($tokenInfo, true);
+
+    // Security checks
+    if (!isset($payload['aud']) || $payload['aud'] !== $googleClientId) {
+        error('Invalid client ID', 401);
+    }
+
+    $validIssuers = ['https://accounts.google.com', 'accounts.google.com'];
+    if (!isset($payload['iss']) || !in_array($payload['iss'], $validIssuers)) {
+        error('Invalid token issuer', 401);
+    }
+
+    if (isset($payload['exp']) && $payload['exp'] < time()) {
+        error('Token expired', 401);
+    }
+
+    if (empty($payload['email'])) {
+        error('No email in Google token', 400);
+    }
+
+    // Token valid — handle in YOUR database
+    $db = getDB();
+
+    // Check if user exists
+    $stmt = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+    $stmt->execute([$payload['email']]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        // Create new user from Google data
+        try {
+            $db->beginTransaction();
+
+            $username = 'google_' . substr($payload['sub'] ?? uniqid(), -8);
+            $displayName = $payload['name'] ?? $payload['email'];
+
+            $db->prepare("
+                INSERT INTO users (username, display_name, email, password_hash, user_type, is_verified)
+                VALUES (?, ?, ?, ?, ?, 1)
+            ")->execute([
+                $username,
+                $displayName,
+                $payload['email'],
+                password_hash(uniqid(), PASSWORD_BCRYPT),
+                'general'
+            ]);
+
+            $userId = (int)$db->lastInsertId();
+
+            $db->prepare("INSERT INTO memberships (user_id, tier_id) VALUES (?, 1)")->execute([$userId]);
+            $membershipId = (int)$db->lastInsertId();
+
+            $db->prepare("UPDATE users SET membership_id = ? WHERE id = ?")->execute([$membershipId, $userId]);
+
+            $db->commit();
+
+            // Fetch newly created user
+            $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+
+        } catch (Exception $e) {
+            $db->rollBack();
+            error('Registration failed: ' . $e->getMessage(), 500);
+        }
+    }
+
+    $token = generateToken([
+        'sub'  => $user['id'],
+        'name' => $user['display_name'],
+        'role' => $user['user_type'],
+    ]);
+
+    respond([
+        'message'      => 'Google login successful',
+        'access_token' => $token,
+        'token_type'   => 'Bearer',
+        'expires_in'   => TOKEN_EXPIRY,
+        'user'         => [
+            'id'            => $user['id'],
+            'username'      => $user['username'],
+            'name'          => $user['display_name'],
+            'email'         => $user['email'],
+            'role'          => $user['user_type'],
+            'membership_id' => $user['membership_id'],
+            'is_verified'   => (bool)$user['is_verified'],
+        ],
+    ]);
+}
+
+*/
+$action = $_GET['action'] ?? '';
+handleAuth($_SERVER['REQUEST_METHOD'], $action);
