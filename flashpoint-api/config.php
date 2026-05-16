@@ -19,10 +19,10 @@ function getDB() {
     $host = 'localhost';
     $dbname = 'flashpoint';      
     $user = 'root';
-    $pass = '';               // XAMPP default: NO password
+    $pass = 'root';               // XAMPP default: NO password || mamp root pass
     $charset = 'utf8mb4';
 
-    $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+    $dsn = "mysql:host=$host;port=8889;dbname=$dbname;charset=$charset";
     $options = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -79,37 +79,48 @@ function generateToken(array $payload) {
 
 
 function requireAuth(): array {
-    $headers = getallheaders();
-    $auth = $headers['Authorization'] ?? '';
+    $auth = '';
+    if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        $auth = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $auth = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        $auth = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+    }
 
-    if (!str_starts_with($auth, 'Bearer ')) {
+    if (empty($auth) || !str_starts_with($auth, 'Bearer ')) {
         error('Authorization header required', 401);
     }
 
     $token = substr($auth, 7);
-
-    // Decode JWT parts
+    error('DEBUG token: ' . substr($token, 0, 20) . ' parts: ' . count(explode('.', $token)), 400);
     $parts = explode('.', $token);
-    if (count($parts) !== 3) {
-        error('Invalid token format', 401);
-    }
+    if (count($parts) !== 3) error('Invalid token format', 401);
 
-    $payload = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1])), true);
-    
-    if (!$payload || empty($payload['sub']) || ($payload['exp'] ?? 0) < time()) {
-        error('Token expired or invalid', 401);
-    }
+    [$b64Header, $b64Payload, $b64Sig] = $parts;
 
     $secret = 'flashpoint-secret-key-2026';
-    $expectedSig = hash_hmac('sha256', "$parts[0].$parts[1]", $secret);
+
+    // Must match exactly how generateToken() creates the signature
+    $expectedSig = hash_hmac('sha256', "$b64Header.$b64Payload", $secret);
     $expectedB64 = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($expectedSig));
-    
-    if (!hash_equals($expectedB64, $parts[2])) {
+
+    if (!hash_equals($expectedB64, $b64Sig)) {
         error('Invalid token signature', 401);
     }
 
+    $payload = json_decode(
+        base64_decode(str_replace(['-', '_'], ['+', '/'], $b64Payload)),
+        true
+    );
+
+    if (!$payload || ($payload['exp'] ?? 0) < time()) {
+        error('Token expired or invalid', 401);
+    }
+
     return [
-        'id' => $payload['sub'],
+        'id'   => $payload['sub'],
         'name' => $payload['name'] ?? '',
         'role' => $payload['role'] ?? 'general',
     ];
